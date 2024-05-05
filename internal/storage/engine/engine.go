@@ -1,6 +1,6 @@
 package engine
 
-type Engine interface {
+type EngineInterface interface {
 	Set(string, string) error
 	Get(string) (string, bool, error)
 	Delete(string) error
