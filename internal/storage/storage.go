@@ -15,10 +15,10 @@ type StorageInterface interface {
 
 type Storage struct {
 	engine engine.EngineInterface
-	logger *zap.SugaredLogger
+	logger *zap.Logger
 }
 
-func CreateStorage(engine engine.EngineInterface, logger *zap.SugaredLogger) (*Storage, error) {
+func CreateStorage(engine engine.EngineInterface, logger *zap.Logger) (*Storage, error) {
 	if engine == nil {
 		return nil, fmt.Errorf("engine is required")
 	}
@@ -33,30 +33,30 @@ func CreateStorage(engine engine.EngineInterface, logger *zap.SugaredLogger) (*S
 }
 
 func (s *Storage) Set(key string, value string) {
-	s.logger.Debugf("storage SET command: %s = %s", key, value)
+	s.logger.Debug(fmt.Sprintf("storage SET command: %s = %s", key, value))
 
 	err := s.engine.Set(key, value)
 	if err != nil {
-		s.logger.Errorf("storage SET command error: %s", err)
+		s.logger.Error(fmt.Sprintf("storage SET command error: %s", err))
 	}
 }
 
 func (s *Storage) Get(key string) (string, bool) {
-	s.logger.Debugf("storage GET command: %s", key)
+	s.logger.Debug(fmt.Sprintf("storage GET command: %s", key))
 
 	value, ok, err := s.engine.Get(key)
 	if err != nil {
-		s.logger.Errorf("storage GET command error: %s", err)
+		s.logger.Error(fmt.Sprintf("storage GET command error: %s", err))
 	}
 
 	return value, ok
 }
 
-func (s *Storage) Det(key string) {
-	s.logger.Debugf("storage DEL command: %s", key)
+func (s *Storage) Del(key string) {
+	s.logger.Debug(fmt.Sprintf("storage DEL command: %s", key))
 
 	err := s.engine.Delete(key)
 	if err != nil {
-		s.logger.Errorf("storage DEL command error: %s", err)
+		s.logger.Error(fmt.Sprintf("storage DEL command error: %s", err))
 	}
 }

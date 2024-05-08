@@ -2,10 +2,11 @@ package engine
 
 import (
 	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 )
 
-const COLLISION_MAX = 10
+const COLLISION_MAX = 5
 
 type dataRecord struct {
 	key   string
@@ -63,15 +64,17 @@ func (t *dataTable) IsSet(key string) (bool, error) {
 func (t *dataTable) Keys() *[]string {
 	var keys = make([]string, len(t.data))
 
+	idx := 0
 	for _, value := range t.data {
-		keys = append(keys, value.key)
+		keys[idx] = value.key
+		idx++
 	}
 
 	return &keys
 }
 
 func (t *dataTable) getHashAndValue(key string) (string, string, bool, error) {
-	for i := 0; i <= COLLISION_MAX; i++ {
+	for i := 0; i < COLLISION_MAX; i++ {
 		hash := t.createHash(key, i)
 		record, ok := t.data[hash]
 
@@ -94,5 +97,5 @@ func (t *dataTable) createHash(key string, idx int) string {
 	}
 	h.Write([]byte(finalKey))
 
-	return string(h.Sum(nil))
+	return hex.EncodeToString(h.Sum(nil))
 }
