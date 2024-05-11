@@ -18,7 +18,7 @@ func main() {
 	displayHelpScreen(db)
 
 	reader := bufio.NewReader(os.Stdin)
-	for i := 0; i < 5; i++ {
+	for {
 		fmt.Print("database cli > ")
 		command, err := reader.ReadString('\n')
 		if err != nil {

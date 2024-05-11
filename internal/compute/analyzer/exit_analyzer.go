@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/alexver/golang_database/internal/compute/parser"
-	"go.uber.org/zap"
 )
 
 const COMMAND_EXIT_1 = "EXIT"
@@ -15,29 +14,25 @@ type Exit struct {
 	Analyzer
 }
 
-func NewExit(logger *zap.Logger) AnalyzerInterface {
+func NewExit() AnalyzerInterface {
 	return &Exit{
-		Analyzer: Analyzer{
-			name:        COMMAND_EXIT_1,
-			description: "Command to stop and close test database. You can use QUIT as an alias of EXIT command.",
-			usage:       fmt.Sprintf("%s|%s", COMMAND_EXIT_1, COMMAND_EXIT_2),
-			logger:      logger,
-		}}
+		Analyzer: Analyzer{},
+	}
 }
 
 func (c *Exit) Name() string {
 
-	return c.name
+	return COMMAND_EXIT_1
 }
 
 func (c *Exit) Description() string {
 
-	return c.description
+	return "Command to stop and close test database. You can use QUIT as an alias of EXIT command."
 }
 
 func (c *Exit) Usage() string {
 
-	return c.usage
+	return fmt.Sprintf("%s|%s", COMMAND_EXIT_1, COMMAND_EXIT_2)
 }
 
 func (c *Exit) Supports(name string) bool {
@@ -50,8 +45,8 @@ func (c *Exit) Validate(query parser.Query) error {
 		return fmt.Errorf("analyzer EXIT error: cannot process '%s' command", query.GetCommand())
 	}
 
-	if len(query.GetArguments()) > 0 {
-		return fmt.Errorf("analyzer EXIT error: invalid argumnet count %d", len(query.GetArguments()))
+	if len(query.GetArguments()) != 0 {
+		return fmt.Errorf("analyzer EXIT error: invalid argument count %d", len(query.GetArguments()))
 	}
 
 	return nil

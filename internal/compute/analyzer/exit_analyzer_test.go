@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/alexver/golang_database/internal/compute/parser"
-	"go.uber.org/zap/zaptest"
 )
 
 func TestExit_Name(t *testing.T) {
@@ -19,7 +18,7 @@ func TestExit_Name(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := NewExit(zaptest.NewLogger(t))
+			c := NewExit()
 			if got := c.Name(); got != tt.want {
 				t.Errorf("Exit.Name() = %v, want %v", got, tt.want)
 			}
@@ -39,7 +38,7 @@ func TestExit_Description(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := NewExit(zaptest.NewLogger(t))
+			c := NewExit()
 			if got := c.Description(); got != tt.want {
 				t.Errorf("Exit.Description() = %v, want %v", got, tt.want)
 			}
@@ -59,7 +58,7 @@ func TestExit_Usage(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := NewExit(zaptest.NewLogger(t))
+			c := NewExit()
 			if got := c.Usage(); got != tt.want {
 				t.Errorf("Exit.Usage() = %v, want %v", got, tt.want)
 			}
@@ -94,7 +93,7 @@ func TestExit_Supports(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := NewExit(zaptest.NewLogger(t))
+			c := NewExit()
 			if got := c.Supports(tt.args.name); got != tt.want {
 				t.Errorf("Exit.Supports() = %v, want %v", got, tt.want)
 			}
@@ -122,7 +121,7 @@ func TestExit_Validate(t *testing.T) {
 			name:      "fail because wrong argument count",
 			args:      args{query: parser.CreateQuery("QUIT", []string{"Test"})},
 			wantErr:   true,
-			errString: "analyzer EXIT error: invalid argumnet count 1",
+			errString: "analyzer EXIT error: invalid argument count 1",
 		},
 		{
 			name:      "ok",
@@ -133,7 +132,7 @@ func TestExit_Validate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := NewExit(zaptest.NewLogger(t))
+			c := NewExit()
 			err := c.Validate(tt.args.query)
 			if (err != nil) != tt.wantErr || (err != nil && err.Error() != tt.errString) {
 				t.Errorf("Exit.Validate() error = %v, wantErr %v", err, tt.wantErr)

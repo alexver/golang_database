@@ -28,7 +28,10 @@ func CreateCLIDatabase() (*Database, error) {
 	}
 
 	compute := compute.CreateComputeLayer(parser.CreatePaser(logger), logger)
-	compute.RegisterAnalyzer(analyzer.NewExit(logger))
+	compute.RegisterAnalyzer(analyzer.NewGet(storage))
+	compute.RegisterAnalyzer(analyzer.NewSet(storage))
+	compute.RegisterAnalyzer(analyzer.NewDel(storage))
+	compute.RegisterAnalyzer(analyzer.NewExit())
 
 	database, err := NewDatabase(storage, compute, logger)
 	if err != nil {

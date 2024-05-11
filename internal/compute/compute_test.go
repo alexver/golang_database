@@ -88,7 +88,7 @@ func TestCompute_HandleQuery(t *testing.T) {
 	}
 
 	list := map[string]analyzer.AnalyzerInterface{}
-	list["EXIT"] = analyzer.NewExit(zaptest.NewLogger(t))
+	list["EXIT"] = analyzer.NewExit()
 
 	parserMock1 := new(parserMock)
 	parserMock1.On("ParseStringToQuery", "EXIT").Once().Return(parser.CreateQuery("EXIT", []string{}))
@@ -185,7 +185,7 @@ func TestCompute_RegisterAnalyzer(t *testing.T) {
 	}
 
 	list := map[string]analyzer.AnalyzerInterface{}
-	list["EXIT"] = analyzer.NewExit(zaptest.NewLogger(t))
+	list["EXIT"] = analyzer.NewExit()
 
 	tests := []struct {
 		name       string
@@ -206,7 +206,7 @@ func TestCompute_RegisterAnalyzer(t *testing.T) {
 		{
 			name:       "analyzer already exist",
 			fields:     fields{parser: nil, analyzers: list, logger: zaptest.NewLogger(t)},
-			args:       args{analyzer: analyzer.NewExit(zaptest.NewLogger(t))},
+			args:       args{analyzer: analyzer.NewExit()},
 			wantErr:    true,
 			errMessage: "analyzer 'EXIT' already registered",
 			wantCount:  1,
@@ -214,7 +214,7 @@ func TestCompute_RegisterAnalyzer(t *testing.T) {
 		{
 			name:       "add analyzer",
 			fields:     fields{parser: nil, analyzers: map[string]analyzer.AnalyzerInterface{}, logger: zaptest.NewLogger(t)},
-			args:       args{analyzer: analyzer.NewExit(zaptest.NewLogger(t))},
+			args:       args{analyzer: analyzer.NewExit()},
 			wantErr:    false,
 			errMessage: "",
 			wantCount:  1,
@@ -245,7 +245,7 @@ func TestCompute_GetAnalyzers(t *testing.T) {
 		logger    *zap.Logger
 	}
 	list := map[string]analyzer.AnalyzerInterface{}
-	list["EXIT"] = analyzer.NewExit(zaptest.NewLogger(t))
+	list["EXIT"] = analyzer.NewExit()
 
 	tests := []struct {
 		name      string

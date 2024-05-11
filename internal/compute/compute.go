@@ -36,7 +36,6 @@ func (c *Compute) HandleQuery(queryStr string) (any, error) {
 		if !analyzer.Supports(query.GetCommand()) {
 			continue
 		}
-		fmt.Printf("%#v", query)
 		if validateErr := analyzer.Validate(query); validateErr != nil {
 			c.logger.Error(fmt.Sprintf("Command '%s' argments validation error: %s", query.GetCommand(), validateErr.Error()))
 

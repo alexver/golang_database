@@ -105,9 +105,10 @@ func TestStorage_Set(t *testing.T) {
 	engineMock.On("Set", "test_error", "test_value").Once().Return(errors.New("write lock"))
 
 	tests := []struct {
-		name   string
-		fields fields
-		args   args
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
 	}{
 		{
 			name: "ok",
@@ -119,7 +120,8 @@ func TestStorage_Set(t *testing.T) {
 					return nil
 				},
 			)))},
-			args: args{key: "test_key", value: "test_value"},
+			args:    args{key: "test_key", value: "test_value"},
+			wantErr: false,
 		},
 		{
 			name: "error",
@@ -133,7 +135,8 @@ func TestStorage_Set(t *testing.T) {
 					return nil
 				},
 			)))},
-			args: args{key: "test_error", value: "test_value"},
+			args:    args{key: "test_error", value: "test_value"},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
@@ -142,7 +145,10 @@ func TestStorage_Set(t *testing.T) {
 				engine: tt.fields.engine,
 				logger: tt.fields.logger,
 			}
-			s.Set(tt.args.key, tt.args.value)
+			err := s.Set(tt.args.key, tt.args.value)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Storage.Set() error = %v, wantErr %v", err, tt.wantErr)
+			}
 		})
 	}
 	engineMock.AssertExpectations(t)
@@ -162,11 +168,12 @@ func TestStorage_Get(t *testing.T) {
 	engineMock.On("Get", "test_error").Once().Return("", false, errors.New("read lock"))
 
 	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		want   string
-		want1  bool
+		name    string
+		fields  fields
+		args    args
+		want    string
+		want1   bool
+		wantErr bool
 	}{
 		{
 			name: "ok",
@@ -178,9 +185,10 @@ func TestStorage_Get(t *testing.T) {
 					return nil
 				},
 			)))},
-			args:  args{key: "test_key"},
-			want:  "test_value",
-			want1: true,
+			args:    args{key: "test_key"},
+			want:    "test_value",
+			want1:   true,
+			wantErr: false,
 		},
 		{
 			name: "error",
@@ -194,9 +202,10 @@ func TestStorage_Get(t *testing.T) {
 					return nil
 				},
 			)))},
-			args:  args{key: "test_error"},
-			want:  "",
-			want1: false,
+			args:    args{key: "test_error"},
+			want:    "",
+			want1:   false,
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
@@ -205,7 +214,10 @@ func TestStorage_Get(t *testing.T) {
 				engine: tt.fields.engine,
 				logger: tt.fields.logger,
 			}
-			got, got1 := s.Get(tt.args.key)
+			got, got1, err := s.Get(tt.args.key)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Storage.Get() error = %v, wantErr %v", err, tt.wantErr)
+			}
 			if got != tt.want {
 				t.Errorf("Storage.Get() got = %v, want %v", got, tt.want)
 			}
@@ -230,9 +242,10 @@ func TestStorage_Del(t *testing.T) {
 	engineMock.On("Delete", "test_error").Once().Return(errors.New("delete lock"))
 
 	tests := []struct {
-		name   string
-		fields fields
-		args   args
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
 	}{
 		{
 			name: "ok",
@@ -244,7 +257,8 @@ func TestStorage_Del(t *testing.T) {
 					return nil
 				},
 			)))},
-			args: args{key: "test_key"},
+			args:    args{key: "test_key"},
+			wantErr: false,
 		},
 		{
 			name: "error",
@@ -258,7 +272,8 @@ func TestStorage_Del(t *testing.T) {
 					return nil
 				},
 			)))},
-			args: args{key: "test_error"},
+			args:    args{key: "test_error"},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
@@ -267,7 +282,10 @@ func TestStorage_Del(t *testing.T) {
 				engine: tt.fields.engine,
 				logger: tt.fields.logger,
 			}
-			s.Del(tt.args.key)
+			err := s.Del(tt.args.key)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Storage.Del() error = %v, wantErr %v", err, tt.wantErr)
+			}
 		})
 	}
 }

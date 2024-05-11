@@ -2,7 +2,7 @@ package analyzer
 
 import (
 	"github.com/alexver/golang_database/internal/compute/parser"
-	"go.uber.org/zap"
+	"github.com/alexver/golang_database/internal/storage"
 )
 
 type AnalyzerInterface interface {
@@ -15,9 +15,5 @@ type AnalyzerInterface interface {
 }
 
 type Analyzer struct {
-	name        string
-	description string
-	usage       string
-
-	logger *zap.Logger
+	storage storage.StorageInterface
 }
