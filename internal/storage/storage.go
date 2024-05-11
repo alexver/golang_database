@@ -18,7 +18,7 @@ type Storage struct {
 	logger *zap.Logger
 }
 
-func CreateStorage(engine engine.EngineInterface, logger *zap.Logger) (*Storage, error) {
+func CreateStorage(engine engine.EngineInterface, logger *zap.Logger) (StorageInterface, error) {
 	if engine == nil {
 		return nil, fmt.Errorf("engine is required")
 	}
