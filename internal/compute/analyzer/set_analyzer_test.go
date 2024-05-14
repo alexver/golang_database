@@ -18,7 +18,7 @@ func TestSet_Name(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := NewSet(nil)
+			s := NewSet()
 			if got := s.Name(); got != tt.want {
 				t.Errorf("Set.Name() = %v, want %v", got, tt.want)
 			}
@@ -28,7 +28,6 @@ func TestSet_Name(t *testing.T) {
 
 func TestSet_Description(t *testing.T) {
 	type fields struct {
-		Analyzer Analyzer
 	}
 	tests := []struct {
 		name   string
@@ -42,7 +41,7 @@ func TestSet_Description(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := NewSet(nil)
+			s := NewSet()
 			if got := s.Description(); got != tt.want {
 				t.Errorf("Set.Description() = %v, want %v", got, tt.want)
 			}
@@ -62,7 +61,7 @@ func TestSet_Usage(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := NewSet(nil)
+			s := NewSet()
 			if got := s.Usage(); got != tt.want {
 				t.Errorf("Set.Usage() = %v, want %v", got, tt.want)
 			}
@@ -92,7 +91,7 @@ func TestSet_Supports(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := NewSet(nil)
+			s := NewSet()
 			if got := s.Supports(tt.args.name); got != tt.want {
 				t.Errorf("Set.Supports() = %v, want %v", got, tt.want)
 			}
@@ -143,7 +142,7 @@ func TestSet_Validate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := NewSet(nil)
+			s := NewSet()
 			if err := s.Validate(tt.args.query); (err != nil) != tt.wantErr {
 				t.Errorf("Set.Validate() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -168,7 +167,7 @@ func TestSet_NormalizeQuery(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := NewSet(nil)
+			s := NewSet()
 			got := s.NormalizeQuery(tt.args.query)
 			if got.GetCommand() != tt.want {
 				t.Errorf("Set.NormalizeQuery() = %v, want %v", got, tt.want)

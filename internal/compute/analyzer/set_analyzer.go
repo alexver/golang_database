@@ -5,21 +5,16 @@ import (
 
 	"github.com/alexver/golang_database/internal/compute/parser"
 	"github.com/alexver/golang_database/internal/compute/tools"
-	"github.com/alexver/golang_database/internal/storage"
 )
 
 const COMMAND_SET = "SET"
 const COMMAND_SET_ARG_COUNT = 2
 
 type Set struct {
-	Analyzer
 }
 
-func NewSet(storage storage.StorageInterface) AnalyzerInterface {
-	return &Set{
-		Analyzer: Analyzer{
-			storage: storage,
-		}}
+func NewSet() AnalyzerInterface {
+	return &Set{}
 }
 
 func (s *Set) Name() string {

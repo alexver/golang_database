@@ -10,13 +10,10 @@ const COMMAND_EXIT_1 = "EXIT"
 const COMMAND_EXIT_2 = "QUIT"
 
 type Exit struct {
-	Analyzer
 }
 
 func NewExit() AnalyzerInterface {
-	return &Exit{
-		Analyzer: Analyzer{},
-	}
+	return &Exit{}
 }
 
 func (c *Exit) Name() string {

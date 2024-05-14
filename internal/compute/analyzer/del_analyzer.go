@@ -5,22 +5,16 @@ import (
 
 	"github.com/alexver/golang_database/internal/compute/parser"
 	"github.com/alexver/golang_database/internal/compute/tools"
-	"github.com/alexver/golang_database/internal/storage"
 )
 
 const COMMAND_DEL = "DEL"
 const COMMAND_DEL2 = "DELETE"
 const COMMAND_DEL_ARG_COUNT = 1
 
-type Del struct {
-	Analyzer
-}
+type Del struct{}
 
-func NewDel(storage storage.StorageInterface) AnalyzerInterface {
-	return &Del{
-		Analyzer: Analyzer{
-			storage: storage,
-		}}
+func NewDel() AnalyzerInterface {
+	return &Del{}
 }
 
 func (d *Del) Name() string {

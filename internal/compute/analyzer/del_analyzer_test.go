@@ -18,7 +18,7 @@ func TestDel_Name(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			d := NewDel(nil)
+			d := NewDel()
 			if got := d.Name(); got != tt.want {
 				t.Errorf("Del.Name() = %v, want %v", got, tt.want)
 			}
@@ -38,7 +38,7 @@ func TestDel_Description(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			d := NewDel(nil)
+			d := NewDel()
 			if got := d.Description(); got != tt.want {
 				t.Errorf("Del.Description() = %v, want %v", got, tt.want)
 			}
@@ -58,7 +58,7 @@ func TestDel_Usage(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			d := NewDel(nil)
+			d := NewDel()
 			if got := d.Usage(); got != tt.want {
 				t.Errorf("Del.Usage() = %v, want %v", got, tt.want)
 			}
@@ -93,7 +93,7 @@ func TestDel_Supports(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			d := NewDel(nil)
+			d := NewDel()
 			if got := d.Supports(tt.args.name); got != tt.want {
 				t.Errorf("Del.Supports() = %v, want %v", got, tt.want)
 			}
@@ -138,7 +138,7 @@ func TestDel_Validate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			d := NewDel(nil)
+			d := NewDel()
 			err := d.Validate(tt.args.query)
 			if (err != nil) != tt.wantErr || (err != nil && err.Error() != tt.errString) {
 				t.Errorf("Del.Validate() error = %v, wantErr %v", err, tt.wantErr)
@@ -164,7 +164,7 @@ func TestDel_NormalizeQuery(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			d := NewDel(nil)
+			d := NewDel()
 			got := d.NormalizeQuery(tt.args.query)
 			if got.GetCommand() != tt.want {
 				t.Errorf("Del.NormalizeQuery() = %v, want %v", got, tt.want)

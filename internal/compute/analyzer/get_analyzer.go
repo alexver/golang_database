@@ -5,21 +5,16 @@ import (
 
 	"github.com/alexver/golang_database/internal/compute/parser"
 	"github.com/alexver/golang_database/internal/compute/tools"
-	"github.com/alexver/golang_database/internal/storage"
 )
 
 const COMMAND_GET = "GET"
 const COMMAND_GET_ARG_COUNT = 1
 
 type Get struct {
-	Analyzer
 }
 
-func NewGet(storage storage.StorageInterface) AnalyzerInterface {
-	return &Get{
-		Analyzer: Analyzer{
-			storage: storage,
-		}}
+func NewGet() AnalyzerInterface {
+	return &Get{}
 }
 
 func (g *Get) Name() string {
