@@ -5,8 +5,8 @@ type Query struct {
 	arguments []string
 }
 
-func CreateQuery(command string, arguments []string) Query {
-	return Query{
+func CreateQuery(command string, arguments []string) *Query {
+	return &Query{
 		command:   command,
 		arguments: arguments,
 	}
@@ -15,6 +15,12 @@ func CreateQuery(command string, arguments []string) Query {
 func (q *Query) GetCommand() string {
 
 	return q.command
+}
+
+func (q *Query) SetCommand(command string) *Query {
+	q.command = command
+
+	return q
 }
 
 func (q *Query) GetArguments() []string {

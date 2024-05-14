@@ -87,3 +87,44 @@ func TestQuery_GetArgumentCount(t *testing.T) {
 		})
 	}
 }
+
+func TestQuery_SetCommand(t *testing.T) {
+	type fields struct {
+		command   string
+		arguments []string
+	}
+	type args struct {
+		command string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   string
+	}{
+		{
+			name:   "empty value",
+			fields: fields{command: "", arguments: []string{}},
+			args:   args{command: ""},
+			want:   "",
+		},
+		{
+			name:   "TEST value",
+			fields: fields{command: "", arguments: []string{}},
+			args:   args{command: "TEST"},
+			want:   "TEST",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			q := &Query{
+				command:   tt.fields.command,
+				arguments: tt.fields.arguments,
+			}
+			got := q.SetCommand(tt.args.command)
+			if got.GetCommand() != tt.want {
+				t.Errorf("Query.SetCommand() = %#v, want %v", got, tt.want)
+			}
+		})
+	}
+}

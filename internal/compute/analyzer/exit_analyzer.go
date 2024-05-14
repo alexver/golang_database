@@ -2,7 +2,6 @@ package analyzer
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/alexver/golang_database/internal/compute/parser"
 )
@@ -40,7 +39,7 @@ func (c *Exit) Supports(name string) bool {
 	return name == COMMAND_EXIT_1 || name == COMMAND_EXIT_2
 }
 
-func (c *Exit) Validate(query parser.Query) error {
+func (c *Exit) Validate(query *parser.Query) error {
 	if !c.Supports(query.GetCommand()) {
 		return fmt.Errorf("analyzer EXIT error: cannot process '%s' command", query.GetCommand())
 	}
@@ -52,8 +51,8 @@ func (c *Exit) Validate(query parser.Query) error {
 	return nil
 }
 
-func (c *Exit) Run(query parser.Query) (any, error) {
-	os.Exit(0)
+func (c *Exit) NormalizeQuery(query *parser.Query) *parser.Query {
+	query.SetCommand(COMMAND_EXIT_1)
 
-	return 0, nil
+	return query
 }

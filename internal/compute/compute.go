@@ -9,7 +9,7 @@ import (
 )
 
 type ComputeInterface interface {
-	HandleQuery(queryStr string) (any, error)
+	HandleQuery(queryStr string) (*parser.Query, error)
 	RegisterAnalyzer(analyzer analyzer.AnalyzerInterface) error
 	GetAnalyzers() []analyzer.AnalyzerInterface
 }
@@ -29,7 +29,7 @@ func CreateComputeLayer(parser parser.ParserInterface, logger *zap.Logger) Compu
 	}
 }
 
-func (c *Compute) HandleQuery(queryStr string) (any, error) {
+func (c *Compute) HandleQuery(queryStr string) (*parser.Query, error) {
 	query := c.parser.ParseStringToQuery(queryStr)
 
 	for _, analyzer := range c.analyzers {
@@ -44,7 +44,9 @@ func (c *Compute) HandleQuery(queryStr string) (any, error) {
 
 		c.logger.Debug(fmt.Sprintf("Command %s is processing by %s analzer", query.GetCommand(), analyzer.Name()))
 
-		return analyzer.Run(query)
+		query = analyzer.NormalizeQuery(query)
+
+		return query, nil
 	}
 
 	c.logger.Error(fmt.Sprintf("Command %s is unknown, didn't find any analyzer to process", query.GetCommand()))

@@ -39,7 +39,7 @@ func (d *Del) Supports(name string) bool {
 	return name == COMMAND_DEL || name == COMMAND_DEL2
 }
 
-func (d *Del) Validate(query parser.Query) error {
+func (d *Del) Validate(query *parser.Query) error {
 	if !d.Supports(query.GetCommand()) {
 		return fmt.Errorf("analyzer DEL error: cannot process '%s' command", query.GetCommand())
 	}
@@ -55,11 +55,9 @@ func (d *Del) Validate(query parser.Query) error {
 	return nil
 }
 
-func (d *Del) Run(query parser.Query) (any, error) {
-	err := d.storage.Del(query.GetArguments()[0])
-	if err != nil {
-		return "", err
-	}
+func (d *Del) NormalizeQuery(query *parser.Query) *parser.Query {
 
-	return "[ok]", nil
+	query.SetCommand(COMMAND_DEL)
+
+	return query
 }

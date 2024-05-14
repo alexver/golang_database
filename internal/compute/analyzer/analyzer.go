@@ -10,8 +10,8 @@ type AnalyzerInterface interface {
 	Description() string
 	Usage() string
 	Supports(name string) bool
-	Validate(query parser.Query) error
-	Run(query parser.Query) (any, error)
+	Validate(query *parser.Query) error
+	NormalizeQuery(query *parser.Query) *parser.Query
 }
 
 type Analyzer struct {

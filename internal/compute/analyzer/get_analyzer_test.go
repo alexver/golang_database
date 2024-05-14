@@ -1,12 +1,9 @@
 package analyzer
 
 import (
-	"errors"
-	"reflect"
 	"testing"
 
 	"github.com/alexver/golang_database/internal/compute/parser"
-	"github.com/stretchr/testify/mock"
 )
 
 func TestGet_Name(t *testing.T) {
@@ -101,7 +98,7 @@ func TestGet_Supports(t *testing.T) {
 
 func TestGet_Validate(t *testing.T) {
 	type args struct {
-		query parser.Query
+		query *parser.Query
 	}
 	tests := []struct {
 		name      string
@@ -144,77 +141,27 @@ func TestGet_Validate(t *testing.T) {
 	}
 }
 
-type storageGetMock struct {
-	mock.Mock
-}
-
-func (m *storageGetMock) Set(_ string, _ string) error {
-	panic("not implemented") // TODO: Implement
-}
-
-func (m *storageGetMock) Get(key string) (string, bool, error) {
-	args := m.Called(key)
-
-	return args.String(0), args.Bool(1), args.Error(2)
-}
-
-func (m *storageGetMock) Del(key string) error {
-	panic("not implemented") // TODO: Implement
-}
-
-func TestGet_Run(t *testing.T) {
+func TestGet_NormalizeQuery(t *testing.T) {
 	type args struct {
-		query parser.Query
+		query *parser.Query
 	}
-
-	storageMock1 := new(storageGetMock)
-	storageMock1.On("Get", "test").Once().Return("", false, errors.New("test error"))
-
-	storageMock2 := new(storageGetMock)
-	storageMock2.On("Get", "test").Once().Return("[not found]", false, nil)
-
-	storageMock3 := new(storageGetMock)
-	storageMock3.On("Get", "test").Once().Return("test", true, nil)
-
 	tests := []struct {
-		name    string
-		storage *storageGetMock
-		args    args
-		want    any
-		wantErr bool
+		name string
+		args args
+		want string
 	}{
 		{
-			name:    "error",
-			storage: storageMock1,
-			args:    args{query: parser.CreateQuery("TEST", []string{"test"})},
-			want:    "",
-			wantErr: true,
-		},
-		{
-			name:    "ok, but not found",
-			storage: storageMock2,
-			args:    args{query: parser.CreateQuery("TEST", []string{"test"})},
-			want:    "[not found]",
-			wantErr: false,
-		},
-		{
-			name:    "ok",
-			storage: storageMock3,
-			args:    args{query: parser.CreateQuery("TEST", []string{"test"})},
-			want:    "test",
-			wantErr: false,
+			name: "check normalization",
+			args: args{query: parser.CreateQuery("TEST", []string{})},
+			want: "GET",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			g := NewGet(tt.storage)
-			got, err := g.Run(tt.args.query)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Get.Run() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Get.Run() = %v, want %v", got, tt.want)
+			g := NewGet(nil)
+			got := g.NormalizeQuery(tt.args.query)
+			if got.GetCommand() != tt.want {
+				t.Errorf("Get.NormalizeQuery() = %v, want %v", got, tt.want)
 			}
 		})
 	}

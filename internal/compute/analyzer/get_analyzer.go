@@ -38,7 +38,7 @@ func (g *Get) Supports(name string) bool {
 	return name == COMMAND_GET
 }
 
-func (g *Get) Validate(query parser.Query) error {
+func (g *Get) Validate(query *parser.Query) error {
 	if !g.Supports(query.GetCommand()) {
 		return fmt.Errorf("analyzer GET error: cannot process '%s' command", query.GetCommand())
 	}
@@ -54,15 +54,9 @@ func (g *Get) Validate(query parser.Query) error {
 	return nil
 }
 
-func (g *Get) Run(query parser.Query) (any, error) {
-	value, ok, err := g.storage.Get(query.GetArguments()[0])
-	if err != nil {
-		return "", err
-	}
+func (g *Get) NormalizeQuery(query *parser.Query) *parser.Query {
 
-	if ok {
-		return value, nil
-	}
+	query.SetCommand(COMMAND_GET)
 
-	return "[not found]", nil
+	return query
 }

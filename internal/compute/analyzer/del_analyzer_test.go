@@ -1,12 +1,9 @@
 package analyzer
 
 import (
-	"errors"
-	"reflect"
 	"testing"
 
 	"github.com/alexver/golang_database/internal/compute/parser"
-	"github.com/stretchr/testify/mock"
 )
 
 func TestDel_Name(t *testing.T) {
@@ -106,7 +103,7 @@ func TestDel_Supports(t *testing.T) {
 
 func TestDel_Validate(t *testing.T) {
 	type args struct {
-		query parser.Query
+		query *parser.Query
 	}
 	tests := []struct {
 		name      string
@@ -150,68 +147,27 @@ func TestDel_Validate(t *testing.T) {
 	}
 }
 
-// storage mock
-type storageDelMock struct {
-	mock.Mock
-}
-
-func (m *storageDelMock) Set(_ string, _ string) error {
-	panic("not implemented") // TODO: Implement
-}
-
-func (m *storageDelMock) Get(_ string) (string, bool, error) {
-	panic("not implemented") // TODO: Implement
-}
-
-func (m *storageDelMock) Del(key string) error {
-	args := m.Called(key)
-
-	return args.Error(0)
-}
-
-func TestDel_Run(t *testing.T) {
+func TestDel_NormalizeQuery(t *testing.T) {
 	type args struct {
-		query parser.Query
+		query *parser.Query
 	}
-
-	storageMock1 := new(storageDelMock)
-	storageMock1.On("Del", "test").Once().Return(errors.New("test error"))
-
-	storageMock2 := new(storageDelMock)
-	storageMock2.On("Del", "test").Once().Return(nil)
-
 	tests := []struct {
-		name    string
-		storage *storageDelMock
-		args    args
-		want    any
-		wantErr bool
+		name string
+		args args
+		want string
 	}{
 		{
-			name:    "error",
-			storage: storageMock1,
-			args:    args{query: parser.CreateQuery("TEST", []string{"test"})},
-			want:    "",
-			wantErr: true,
-		},
-		{
-			name:    "ok",
-			storage: storageMock2,
-			args:    args{query: parser.CreateQuery("TEST", []string{"test"})},
-			want:    "[ok]",
-			wantErr: false,
+			name: "check normalization",
+			args: args{query: parser.CreateQuery("TEST", []string{})},
+			want: "DEL",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			d := NewDel(tt.storage)
-			got, err := d.Run(tt.args.query)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Del.Run() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Del.Run() = %v, want %v", got, tt.want)
+			d := NewDel(nil)
+			got := d.NormalizeQuery(tt.args.query)
+			if got.GetCommand() != tt.want {
+				t.Errorf("Del.NormalizeQuery() = %v, want %v", got, tt.want)
 			}
 		})
 	}

@@ -41,7 +41,7 @@ func (s *Set) Supports(name string) bool {
 	return name == COMMAND_SET
 }
 
-func (s *Set) Validate(query parser.Query) error {
+func (s *Set) Validate(query *parser.Query) error {
 	if !s.Supports(query.GetCommand()) {
 		return fmt.Errorf("analyzer SET error: cannot process '%s' command", query.GetCommand())
 	}
@@ -59,11 +59,9 @@ func (s *Set) Validate(query parser.Query) error {
 	return nil
 }
 
-func (s *Set) Run(query parser.Query) (any, error) {
-	err := s.storage.Set(query.GetArguments()[0], query.GetArguments()[1])
-	if err != nil {
-		return "", err
-	}
+func (s *Set) NormalizeQuery(query *parser.Query) *parser.Query {
 
-	return "[ok]", nil
+	query.SetCommand(COMMAND_SET)
+
+	return query
 }

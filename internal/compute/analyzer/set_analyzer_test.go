@@ -1,12 +1,9 @@
 package analyzer
 
 import (
-	"errors"
-	"reflect"
 	"testing"
 
 	"github.com/alexver/golang_database/internal/compute/parser"
-	"github.com/stretchr/testify/mock"
 )
 
 func TestSet_Name(t *testing.T) {
@@ -105,7 +102,7 @@ func TestSet_Supports(t *testing.T) {
 
 func TestSet_Validate(t *testing.T) {
 	type args struct {
-		query parser.Query
+		query *parser.Query
 	}
 	tests := []struct {
 		name      string
@@ -154,67 +151,27 @@ func TestSet_Validate(t *testing.T) {
 	}
 }
 
-type storageSetMock struct {
-	mock.Mock
-}
-
-func (m *storageSetMock) Set(key string, value string) error {
-	args := m.Called(key, value)
-
-	return args.Error(0)
-}
-
-func (m *storageSetMock) Get(key string) (string, bool, error) {
-	panic("not implemented") // TODO: Implement
-}
-
-func (m *storageSetMock) Del(key string) error {
-	panic("not implemented") // TODO: Implement
-}
-
-func TestSet_Run(t *testing.T) {
+func TestSet_NormalizeQuery(t *testing.T) {
 	type args struct {
-		query parser.Query
+		query *parser.Query
 	}
-
-	storageMock1 := new(storageSetMock)
-	storageMock1.On("Set", "test", "value").Once().Return(errors.New("test error"))
-
-	storageMock2 := new(storageSetMock)
-	storageMock2.On("Set", "test", "value").Once().Return(nil)
-
 	tests := []struct {
-		name    string
-		storage *storageSetMock
-		args    args
-		want    any
-		wantErr bool
+		name string
+		args args
+		want string
 	}{
 		{
-			name:    "error",
-			storage: storageMock1,
-			args:    args{query: parser.CreateQuery("TEST", []string{"test", "value"})},
-			want:    "",
-			wantErr: true,
-		},
-		{
-			name:    "ok",
-			storage: storageMock2,
-			args:    args{query: parser.CreateQuery("TEST", []string{"test", "value"})},
-			want:    "[ok]",
-			wantErr: false,
+			name: "check normalization",
+			args: args{query: parser.CreateQuery("TEST", []string{})},
+			want: "SET",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := NewSet(tt.storage)
-			got, err := s.Run(tt.args.query)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Set.Run() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Set.Run() = %v, want %v", got, tt.want)
+			s := NewSet(nil)
+			got := s.NormalizeQuery(tt.args.query)
+			if got.GetCommand() != tt.want {
+				t.Errorf("Set.NormalizeQuery() = %v, want %v", got, tt.want)
 			}
 		})
 	}

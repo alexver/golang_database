@@ -42,9 +42,9 @@ type parserMock struct {
 	mock.Mock
 }
 
-func (m *parserMock) ParseStringToQuery(command string) parser.Query {
+func (m *parserMock) ParseStringToQuery(command string) *parser.Query {
 	args := m.Called(command)
-	return args.Get(0).(parser.Query)
+	return args.Get(0).(*parser.Query)
 }
 
 // analyzer mock
@@ -68,13 +68,13 @@ func (m *analyzerMock) Supports(name string) bool {
 	args := m.Called(name)
 	return args.Bool(0)
 }
-func (m *analyzerMock) Validate(query parser.Query) error {
+func (m *analyzerMock) Validate(query *parser.Query) error {
 	args := m.Called(query)
 	return args.Error(0)
 }
-func (m *analyzerMock) Run(query parser.Query) (any, error) {
+func (m *analyzerMock) NormalizeQuery(query *parser.Query) *parser.Query {
 	args := m.Called(query)
-	return args.String(0), args.Error(1)
+	return args.Get(0).(*parser.Query)
 }
 
 func TestCompute_HandleQuery(t *testing.T) {
@@ -109,7 +109,7 @@ func TestCompute_HandleQuery(t *testing.T) {
 	analyzerMock2 := new(analyzerMock)
 	analyzerMock2.On("Supports", mock.Anything).Once().Return(true)
 	analyzerMock2.On("Validate", mock.Anything).Once().Return(nil)
-	analyzerMock2.On("Run", query3).Once().Return("ok", nil)
+	analyzerMock2.On("NormalizeQuery", query3).Once().Return(query3)
 	analyzerMock2.On("Name").Once().Return("MOCK")
 	list2 := map[string]analyzer.AnalyzerInterface{}
 	list2["MOCK"] = analyzerMock2
@@ -118,7 +118,7 @@ func TestCompute_HandleQuery(t *testing.T) {
 		name      string
 		fields    fields
 		args      args
-		want      any
+		want      *parser.Query
 		wantErr   bool
 		errString string
 	}{
@@ -150,7 +150,7 @@ func TestCompute_HandleQuery(t *testing.T) {
 			name:      "command processed",
 			fields:    fields{parser: parserMock3, analyzers: list2, logger: zaptest.NewLogger(t)},
 			args:      args{queryStr: "MOCK"},
-			want:      "ok",
+			want:      parser.CreateQuery("MOCK", []string{}),
 			wantErr:   false,
 			errString: "",
 		},

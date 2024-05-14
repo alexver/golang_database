@@ -103,7 +103,7 @@ func TestExit_Supports(t *testing.T) {
 
 func TestExit_Validate(t *testing.T) {
 	type args struct {
-		query parser.Query
+		query *parser.Query
 	}
 	tests := []struct {
 		name      string
@@ -136,6 +136,32 @@ func TestExit_Validate(t *testing.T) {
 			err := c.Validate(tt.args.query)
 			if (err != nil) != tt.wantErr || (err != nil && err.Error() != tt.errString) {
 				t.Errorf("Exit.Validate() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestExit_NormalizeQuery(t *testing.T) {
+	type args struct {
+		query *parser.Query
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "check normalization",
+			args: args{query: parser.CreateQuery("TEST", []string{})},
+			want: "EXIT",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := NewExit()
+			got := c.NormalizeQuery(tt.args.query)
+			if got.GetCommand() != tt.want {
+				t.Errorf("Exit.NormalizeQuery() = %#v, want %v", got, tt.want)
 			}
 		})
 	}

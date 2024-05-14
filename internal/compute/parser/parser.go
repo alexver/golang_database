@@ -8,7 +8,7 @@ import (
 )
 
 type ParserInterface interface {
-	ParseStringToQuery(command string) Query
+	ParseStringToQuery(command string) *Query
 }
 
 type Parser struct {
@@ -20,7 +20,7 @@ func CreatePaser(logger *zap.Logger) ParserInterface {
 	return &Parser{logger: logger}
 }
 
-func (p *Parser) ParseStringToQuery(command string) Query {
+func (p *Parser) ParseStringToQuery(command string) *Query {
 	if strings.Trim(command, " \t\n") == "" {
 		return CreateQuery("", []string{})
 	}
