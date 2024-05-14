@@ -7,7 +7,6 @@ import (
 	"github.com/alexver/golang_database/internal/compute"
 	"github.com/alexver/golang_database/internal/compute/analyzer"
 	database "github.com/alexver/golang_database/internal/processor"
-	"github.com/alexver/golang_database/internal/storage"
 	"go.uber.org/zap"
 )
 
@@ -17,32 +16,6 @@ type Database struct {
 	processors map[string]database.ProcessorInterface
 
 	logger *zap.Logger
-}
-
-func NewDatabase(storage storage.StorageInterface, compute compute.ComputeInterface, logger *zap.Logger) (*Database, error) {
-	if storage == nil {
-		return nil, errors.New("storage is undefined")
-	}
-
-	if compute == nil {
-		return nil, errors.New("compute layer is undefined")
-	}
-
-	if logger == nil {
-		return nil, errors.New("logger is undefined")
-	}
-
-	db := Database{
-		compute:    compute,
-		processors: make(map[string]database.ProcessorInterface),
-		logger:     logger,
-	}
-	db.RegisterProcessor(database.NewGetProcessor(storage))
-	db.RegisterProcessor(database.NewSetProcessor(storage))
-	db.RegisterProcessor(database.NewDelProcessor(storage))
-	db.RegisterProcessor(database.NewExitProcessor())
-
-	return &db, nil
 }
 
 func (db *Database) RegisterProcessor(processor database.ProcessorInterface) error {
