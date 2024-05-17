@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/alexver/golang_database/internal/compute/analyzer"
-	"github.com/alexver/golang_database/internal/compute/parser"
+	"github.com/alexver/golang_database/internal/query"
 	"github.com/stretchr/testify/mock"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zaptest"
@@ -14,7 +14,7 @@ import (
 
 func TestCreateComputeLayer(t *testing.T) {
 	type args struct {
-		parser parser.ParserInterface
+		parser ParserInterface
 		logger *zap.Logger
 	}
 	tests := []struct {
@@ -42,9 +42,9 @@ type parserMock struct {
 	mock.Mock
 }
 
-func (m *parserMock) ParseStringToQuery(command string) *parser.Query {
+func (m *parserMock) ParseStringToQuery(command string) *query.Query {
 	args := m.Called(command)
-	return args.Get(0).(*parser.Query)
+	return args.Get(0).(*query.Query)
 }
 
 // analyzer mock
@@ -68,42 +68,42 @@ func (m *analyzerMock) Supports(name string) bool {
 	args := m.Called(name)
 	return args.Bool(0)
 }
-func (m *analyzerMock) Validate(query *parser.Query) error {
+func (m *analyzerMock) Validate(query *query.Query) error {
 	args := m.Called(query)
 	return args.Error(0)
 }
-func (m *analyzerMock) NormalizeQuery(query *parser.Query) *parser.Query {
-	args := m.Called(query)
-	return args.Get(0).(*parser.Query)
+func (m *analyzerMock) NormalizeQuery(qr *query.Query) *query.Query {
+	args := m.Called(qr)
+	return args.Get(0).(*query.Query)
 }
 
 func TestCompute_HandleQuery(t *testing.T) {
 	type fields struct {
-		parser    parser.ParserInterface
-		analyzers map[string]analyzer.AnalyzerInterface
+		parser    ParserInterface
+		analyzers map[string]AnalyzerInterface
 		logger    *zap.Logger
 	}
 	type args struct {
 		queryStr string
 	}
 
-	list := map[string]analyzer.AnalyzerInterface{}
+	list := map[string]AnalyzerInterface{}
 	list["EXIT"] = analyzer.NewExit()
 
 	parserMock1 := new(parserMock)
-	parserMock1.On("ParseStringToQuery", "EXIT").Once().Return(parser.CreateQuery("EXIT", []string{}))
+	parserMock1.On("ParseStringToQuery", "EXIT").Once().Return(query.CreateQuery("EXIT", []string{}))
 
 	parserMock2 := new(parserMock)
-	parserMock2.On("ParseStringToQuery", "TEST").Once().Return(parser.CreateQuery("TEST", []string{}))
+	parserMock2.On("ParseStringToQuery", "TEST").Once().Return(query.CreateQuery("TEST", []string{}))
 
-	query3 := parser.CreateQuery("MOCK", []string{})
+	query3 := query.CreateQuery("MOCK", []string{})
 	parserMock3 := new(parserMock)
 	parserMock3.On("ParseStringToQuery", "MOCK").Return(query3)
 
 	analyzerMock1 := new(analyzerMock)
 	analyzerMock1.On("Supports", mock.Anything).Once().Return(true)
 	analyzerMock1.On("Validate", query3).Once().Return(errors.New("wrong param"))
-	list1 := map[string]analyzer.AnalyzerInterface{}
+	list1 := map[string]AnalyzerInterface{}
 	list1["MOCK"] = analyzerMock1
 
 	analyzerMock2 := new(analyzerMock)
@@ -111,20 +111,20 @@ func TestCompute_HandleQuery(t *testing.T) {
 	analyzerMock2.On("Validate", mock.Anything).Once().Return(nil)
 	analyzerMock2.On("NormalizeQuery", query3).Once().Return(query3)
 	analyzerMock2.On("Name").Once().Return("MOCK")
-	list2 := map[string]analyzer.AnalyzerInterface{}
+	list2 := map[string]AnalyzerInterface{}
 	list2["MOCK"] = analyzerMock2
 
 	tests := []struct {
 		name      string
 		fields    fields
 		args      args
-		want      *parser.Query
+		want      *query.Query
 		wantErr   bool
 		errString string
 	}{
 		{
 			name:      "empty analyzer list",
-			fields:    fields{parser: parserMock1, analyzers: map[string]analyzer.AnalyzerInterface{}, logger: zaptest.NewLogger(t)},
+			fields:    fields{parser: parserMock1, analyzers: map[string]AnalyzerInterface{}, logger: zaptest.NewLogger(t)},
 			args:      args{queryStr: "EXIT"},
 			want:      nil,
 			wantErr:   true,
@@ -150,7 +150,7 @@ func TestCompute_HandleQuery(t *testing.T) {
 			name:      "command processed",
 			fields:    fields{parser: parserMock3, analyzers: list2, logger: zaptest.NewLogger(t)},
 			args:      args{queryStr: "MOCK"},
-			want:      parser.CreateQuery("MOCK", []string{}),
+			want:      query.CreateQuery("MOCK", []string{}),
 			wantErr:   false,
 			errString: "",
 		},
@@ -176,15 +176,15 @@ func TestCompute_HandleQuery(t *testing.T) {
 
 func TestCompute_RegisterAnalyzer(t *testing.T) {
 	type fields struct {
-		parser    parser.ParserInterface
-		analyzers map[string]analyzer.AnalyzerInterface
+		parser    ParserInterface
+		analyzers map[string]AnalyzerInterface
 		logger    *zap.Logger
 	}
 	type args struct {
-		analyzer analyzer.AnalyzerInterface
+		analyzer AnalyzerInterface
 	}
 
-	list := map[string]analyzer.AnalyzerInterface{}
+	list := map[string]AnalyzerInterface{}
 	list["EXIT"] = analyzer.NewExit()
 
 	tests := []struct {
@@ -197,7 +197,7 @@ func TestCompute_RegisterAnalyzer(t *testing.T) {
 	}{
 		{
 			name:       "empty analyzer",
-			fields:     fields{parser: nil, analyzers: map[string]analyzer.AnalyzerInterface{}, logger: zaptest.NewLogger(t)},
+			fields:     fields{parser: nil, analyzers: map[string]AnalyzerInterface{}, logger: zaptest.NewLogger(t)},
 			args:       args{analyzer: nil},
 			wantErr:    true,
 			errMessage: "analyzer is not defined",
@@ -213,7 +213,7 @@ func TestCompute_RegisterAnalyzer(t *testing.T) {
 		},
 		{
 			name:       "add analyzer",
-			fields:     fields{parser: nil, analyzers: map[string]analyzer.AnalyzerInterface{}, logger: zaptest.NewLogger(t)},
+			fields:     fields{parser: nil, analyzers: map[string]AnalyzerInterface{}, logger: zaptest.NewLogger(t)},
 			args:       args{analyzer: analyzer.NewExit()},
 			wantErr:    false,
 			errMessage: "",
@@ -240,11 +240,11 @@ func TestCompute_RegisterAnalyzer(t *testing.T) {
 
 func TestCompute_GetAnalyzers(t *testing.T) {
 	type fields struct {
-		parser    parser.ParserInterface
-		analyzers map[string]analyzer.AnalyzerInterface
+		parser    ParserInterface
+		analyzers map[string]AnalyzerInterface
 		logger    *zap.Logger
 	}
-	list := map[string]analyzer.AnalyzerInterface{}
+	list := map[string]AnalyzerInterface{}
 	list["EXIT"] = analyzer.NewExit()
 
 	tests := []struct {
@@ -254,7 +254,7 @@ func TestCompute_GetAnalyzers(t *testing.T) {
 	}{
 		{
 			name:      "empty list",
-			fields:    fields{parser: nil, analyzers: map[string]analyzer.AnalyzerInterface{}, logger: zaptest.NewLogger(t)},
+			fields:    fields{parser: nil, analyzers: map[string]AnalyzerInterface{}, logger: zaptest.NewLogger(t)},
 			wantCount: 0,
 		},
 		{

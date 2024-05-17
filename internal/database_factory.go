@@ -34,15 +34,11 @@ func CreateCLIDatabase() (*Database, error) {
 	compute.RegisterAnalyzer(analyzer.NewDel())
 	compute.RegisterAnalyzer(analyzer.NewExit())
 
-	db := Database{
-		compute:    compute,
-		processors: make(map[string]database.ProcessorInterface),
-		logger:     logger,
-	}
+	db := NewDatabase(compute, logger)
 	db.RegisterProcessor(database.NewGetProcessor(storage))
 	db.RegisterProcessor(database.NewSetProcessor(storage))
 	db.RegisterProcessor(database.NewDelProcessor(storage))
 	db.RegisterProcessor(database.NewExitProcessor())
 
-	return &db, nil
+	return db, nil
 }

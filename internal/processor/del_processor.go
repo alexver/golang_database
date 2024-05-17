@@ -1,7 +1,7 @@
 package database
 
 import (
-	"github.com/alexver/golang_database/internal/compute/parser"
+	"github.com/alexver/golang_database/internal/query"
 	"github.com/alexver/golang_database/internal/storage"
 )
 
@@ -11,7 +11,7 @@ type DelProcessor struct {
 	Processor
 }
 
-func NewDelProcessor(storage storage.StorageInterface) ProcessorInterface {
+func NewDelProcessor(storage storage.StorageInterface) *DelProcessor {
 	return &DelProcessor{
 		Processor: Processor{storage: storage},
 	}
@@ -21,11 +21,11 @@ func (p *DelProcessor) Name() string {
 	return PROCESSOR_NAME_DEL
 }
 
-func (p *DelProcessor) Suports(query *parser.Query) bool {
+func (p *DelProcessor) Suports(query *query.Query) bool {
 	return query.GetCommand() == PROCESSOR_NAME_DEL
 }
 
-func (p *DelProcessor) Process(query *parser.Query) (any, error) {
+func (p *DelProcessor) Process(query *query.Query) (any, error) {
 	err := p.storage.Del(query.GetArguments()[0])
 	if err != nil {
 		return "", err

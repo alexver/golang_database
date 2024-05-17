@@ -1,4 +1,4 @@
-package parser
+package query
 
 type Query struct {
 	command   string

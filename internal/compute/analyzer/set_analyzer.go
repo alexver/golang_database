@@ -3,8 +3,8 @@ package analyzer
 import (
 	"fmt"
 
-	"github.com/alexver/golang_database/internal/compute/parser"
 	"github.com/alexver/golang_database/internal/compute/tools"
+	"github.com/alexver/golang_database/internal/query"
 )
 
 const COMMAND_SET = "SET"
@@ -13,7 +13,7 @@ const COMMAND_SET_ARG_COUNT = 2
 type Set struct {
 }
 
-func NewSet() AnalyzerInterface {
+func NewSet() *Set {
 	return &Set{}
 }
 
@@ -36,7 +36,7 @@ func (s *Set) Supports(name string) bool {
 	return name == COMMAND_SET
 }
 
-func (s *Set) Validate(query *parser.Query) error {
+func (s *Set) Validate(query *query.Query) error {
 	if !s.Supports(query.GetCommand()) {
 		return fmt.Errorf("analyzer SET error: cannot process '%s' command", query.GetCommand())
 	}
@@ -54,7 +54,7 @@ func (s *Set) Validate(query *parser.Query) error {
 	return nil
 }
 
-func (s *Set) NormalizeQuery(query *parser.Query) *parser.Query {
+func (s *Set) NormalizeQuery(query *query.Query) *query.Query {
 
 	query.SetCommand(COMMAND_SET)
 

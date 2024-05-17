@@ -3,7 +3,7 @@ package database
 import (
 	"testing"
 
-	"github.com/alexver/golang_database/internal/compute/parser"
+	"github.com/alexver/golang_database/internal/query"
 )
 
 func TestExitProcessor_Name(t *testing.T) {
@@ -28,7 +28,7 @@ func TestExitProcessor_Name(t *testing.T) {
 
 func TestExitProcessor_Suports(t *testing.T) {
 	type args struct {
-		query *parser.Query
+		query *query.Query
 	}
 	tests := []struct {
 		name string
@@ -37,12 +37,12 @@ func TestExitProcessor_Suports(t *testing.T) {
 	}{
 		{
 			name: "no support",
-			args: args{query: parser.CreateQuery("TEST", []string{})},
+			args: args{query: query.CreateQuery("TEST", []string{})},
 			want: false,
 		},
 		{
 			name: "ok",
-			args: args{query: parser.CreateQuery("EXIT", []string{})},
+			args: args{query: query.CreateQuery("EXIT", []string{})},
 			want: true,
 		},
 	}

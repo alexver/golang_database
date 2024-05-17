@@ -3,7 +3,7 @@ package analyzer
 import (
 	"testing"
 
-	"github.com/alexver/golang_database/internal/compute/parser"
+	"github.com/alexver/golang_database/internal/query"
 )
 
 func TestExit_Name(t *testing.T) {
@@ -103,7 +103,7 @@ func TestExit_Supports(t *testing.T) {
 
 func TestExit_Validate(t *testing.T) {
 	type args struct {
-		query *parser.Query
+		query *query.Query
 	}
 	tests := []struct {
 		name      string
@@ -113,19 +113,19 @@ func TestExit_Validate(t *testing.T) {
 	}{
 		{
 			name:      "fail because wrong command name",
-			args:      args{query: parser.CreateQuery("ANY", []string{"Test"})},
+			args:      args{query: query.CreateQuery("ANY", []string{"Test"})},
 			wantErr:   true,
 			errString: "analyzer EXIT error: cannot process 'ANY' command",
 		},
 		{
 			name:      "fail because wrong argument count",
-			args:      args{query: parser.CreateQuery("QUIT", []string{"Test"})},
+			args:      args{query: query.CreateQuery("QUIT", []string{"Test"})},
 			wantErr:   true,
 			errString: "analyzer EXIT error: invalid argument count 1",
 		},
 		{
 			name:      "ok",
-			args:      args{query: parser.CreateQuery("EXIT", []string{})},
+			args:      args{query: query.CreateQuery("EXIT", []string{})},
 			wantErr:   false,
 			errString: "",
 		},
@@ -143,7 +143,7 @@ func TestExit_Validate(t *testing.T) {
 
 func TestExit_NormalizeQuery(t *testing.T) {
 	type args struct {
-		query *parser.Query
+		query *query.Query
 	}
 	tests := []struct {
 		name string
@@ -152,7 +152,7 @@ func TestExit_NormalizeQuery(t *testing.T) {
 	}{
 		{
 			name: "check normalization",
-			args: args{query: parser.CreateQuery("TEST", []string{})},
+			args: args{query: query.CreateQuery("TEST", []string{})},
 			want: "EXIT",
 		},
 	}

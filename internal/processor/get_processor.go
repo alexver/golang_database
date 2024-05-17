@@ -3,7 +3,7 @@ package database
 import (
 	"fmt"
 
-	"github.com/alexver/golang_database/internal/compute/parser"
+	"github.com/alexver/golang_database/internal/query"
 	"github.com/alexver/golang_database/internal/storage"
 )
 
@@ -13,7 +13,7 @@ type GetProcessor struct {
 	Processor
 }
 
-func NewGetProcessor(storage storage.StorageInterface) ProcessorInterface {
+func NewGetProcessor(storage storage.StorageInterface) *GetProcessor {
 	return &GetProcessor{
 		Processor: Processor{storage: storage},
 	}
@@ -23,11 +23,11 @@ func (p *GetProcessor) Name() string {
 	return PROCESSOR_NAME_GET
 }
 
-func (p *GetProcessor) Suports(query *parser.Query) bool {
+func (p *GetProcessor) Suports(query *query.Query) bool {
 	return query.GetCommand() == PROCESSOR_NAME_GET
 }
 
-func (p *GetProcessor) Process(query *parser.Query) (any, error) {
+func (p *GetProcessor) Process(query *query.Query) (any, error) {
 	value, ok, err := p.storage.Get(query.GetArguments()[0])
 	if err != nil {
 		return "", err

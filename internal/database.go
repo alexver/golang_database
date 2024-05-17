@@ -5,20 +5,39 @@ import (
 	"fmt"
 
 	"github.com/alexver/golang_database/internal/compute"
-	"github.com/alexver/golang_database/internal/compute/analyzer"
-	database "github.com/alexver/golang_database/internal/processor"
+	"github.com/alexver/golang_database/internal/query"
 	"go.uber.org/zap"
 )
 
-type Database struct {
-	compute compute.ComputeInterface
+type ComputeInterface interface {
+	HandleQuery(queryStr string) (*query.Query, error)
+	RegisterAnalyzer(compute.AnalyzerInterface) error
+	GetAnalyzers() []compute.AnalyzerInterface
+}
 
-	processors map[string]database.ProcessorInterface
+type ProcessorInterface interface {
+	Name() string
+	Suports(query *query.Query) bool
+	Process(query *query.Query) (any, error)
+}
+
+type Database struct {
+	compute ComputeInterface
+
+	processors map[string]ProcessorInterface
 
 	logger *zap.Logger
 }
 
-func (db *Database) RegisterProcessor(processor database.ProcessorInterface) error {
+func NewDatabase(compute ComputeInterface, logger *zap.Logger) *Database {
+	return &Database{
+		compute:    compute,
+		logger:     logger,
+		processors: make(map[string]ProcessorInterface),
+	}
+}
+
+func (db *Database) RegisterProcessor(processor ProcessorInterface) error {
 	if processor == nil {
 		db.logger.Error("Register DB Processor error: Processor is not defined")
 
@@ -37,7 +56,7 @@ func (db *Database) RegisterProcessor(processor database.ProcessorInterface) err
 	return nil
 }
 
-func (db *Database) GetAnalyzers() []analyzer.AnalyzerInterface {
+func (db *Database) GetAnalyzers() []compute.AnalyzerInterface {
 
 	return db.compute.GetAnalyzers()
 }

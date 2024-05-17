@@ -3,33 +3,39 @@ package compute
 import (
 	"fmt"
 
-	"github.com/alexver/golang_database/internal/compute/analyzer"
-	"github.com/alexver/golang_database/internal/compute/parser"
+	"github.com/alexver/golang_database/internal/query"
 	"go.uber.org/zap"
 )
 
-type ComputeInterface interface {
-	HandleQuery(queryStr string) (*parser.Query, error)
-	RegisterAnalyzer(analyzer analyzer.AnalyzerInterface) error
-	GetAnalyzers() []analyzer.AnalyzerInterface
+type ParserInterface interface {
+	ParseStringToQuery(command string) *query.Query
+}
+
+type AnalyzerInterface interface {
+	Name() string
+	Description() string
+	Usage() string
+	Supports(name string) bool
+	Validate(query *query.Query) error
+	NormalizeQuery(query *query.Query) *query.Query
 }
 
 type Compute struct {
-	parser    parser.ParserInterface
-	analyzers map[string]analyzer.AnalyzerInterface
+	parser    ParserInterface
+	analyzers map[string]AnalyzerInterface
 
 	logger *zap.Logger
 }
 
-func CreateComputeLayer(parser parser.ParserInterface, logger *zap.Logger) ComputeInterface {
+func CreateComputeLayer(parser ParserInterface, logger *zap.Logger) *Compute {
 	return &Compute{
 		parser:    parser,
 		logger:    logger,
-		analyzers: make(map[string]analyzer.AnalyzerInterface),
+		analyzers: make(map[string]AnalyzerInterface),
 	}
 }
 
-func (c *Compute) HandleQuery(queryStr string) (*parser.Query, error) {
+func (c *Compute) HandleQuery(queryStr string) (*query.Query, error) {
 	query := c.parser.ParseStringToQuery(queryStr)
 
 	for _, analyzer := range c.analyzers {
@@ -54,7 +60,7 @@ func (c *Compute) HandleQuery(queryStr string) (*parser.Query, error) {
 	return nil, fmt.Errorf("command %s is unknown", query.GetCommand())
 }
 
-func (c *Compute) RegisterAnalyzer(analyzer analyzer.AnalyzerInterface) error {
+func (c *Compute) RegisterAnalyzer(analyzer AnalyzerInterface) error {
 	if analyzer == nil {
 		c.logger.Error("Register Analyzer error: analyzer is not defined")
 
@@ -73,8 +79,8 @@ func (c *Compute) RegisterAnalyzer(analyzer analyzer.AnalyzerInterface) error {
 	return nil
 }
 
-func (c *Compute) GetAnalyzers() []analyzer.AnalyzerInterface {
-	result := []analyzer.AnalyzerInterface{}
+func (c *Compute) GetAnalyzers() []AnalyzerInterface {
+	result := []AnalyzerInterface{}
 
 	for _, analyzer := range c.analyzers {
 		result = append(result, analyzer)

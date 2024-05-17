@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/alexver/golang_database/internal/compute/parser"
+	"github.com/alexver/golang_database/internal/query"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -31,7 +31,7 @@ func TestSetProcessor_Name(t *testing.T) {
 
 func TestSetProcessor_Suports(t *testing.T) {
 	type args struct {
-		query *parser.Query
+		query *query.Query
 	}
 	tests := []struct {
 		name string
@@ -40,12 +40,12 @@ func TestSetProcessor_Suports(t *testing.T) {
 	}{
 		{
 			name: "no support",
-			args: args{query: parser.CreateQuery("TEST", []string{})},
+			args: args{query: query.CreateQuery("TEST", []string{})},
 			want: false,
 		},
 		{
 			name: "ok",
-			args: args{query: parser.CreateQuery("SET", []string{})},
+			args: args{query: query.CreateQuery("SET", []string{})},
 			want: true,
 		},
 	}
@@ -79,7 +79,7 @@ func (m *storageSetMock) Del(key string) error {
 
 func TestSetProcessor_Process(t *testing.T) {
 	type args struct {
-		query *parser.Query
+		query *query.Query
 	}
 
 	storageMock1 := new(storageSetMock)
@@ -98,14 +98,14 @@ func TestSetProcessor_Process(t *testing.T) {
 		{
 			name:    "error",
 			storage: storageMock1,
-			args:    args{query: parser.CreateQuery("TEST", []string{"test", "value"})},
+			args:    args{query: query.CreateQuery("TEST", []string{"test", "value"})},
 			want:    "",
 			wantErr: true,
 		},
 		{
 			name:    "ok",
 			storage: storageMock2,
-			args:    args{query: parser.CreateQuery("TEST", []string{"test", "value"})},
+			args:    args{query: query.CreateQuery("TEST", []string{"test", "value"})},
 			want:    "[ok]",
 			wantErr: false,
 		},

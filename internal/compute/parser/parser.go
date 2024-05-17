@@ -4,25 +4,22 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/alexver/golang_database/internal/query"
 	"go.uber.org/zap"
 )
-
-type ParserInterface interface {
-	ParseStringToQuery(command string) *Query
-}
 
 type Parser struct {
 	logger *zap.Logger
 }
 
-func CreatePaser(logger *zap.Logger) ParserInterface {
+func CreatePaser(logger *zap.Logger) *Parser {
 
 	return &Parser{logger: logger}
 }
 
-func (p *Parser) ParseStringToQuery(command string) *Query {
+func (p *Parser) ParseStringToQuery(command string) *query.Query {
 	if strings.Trim(command, " \t\n") == "" {
-		return CreateQuery("", []string{})
+		return query.CreateQuery("", []string{})
 	}
 
 	items := strings.Fields(command)
@@ -31,7 +28,7 @@ func (p *Parser) ParseStringToQuery(command string) *Query {
 	if len(items) > 1 {
 		args = items[1:]
 	}
-	result := CreateQuery(items[0], args)
+	result := query.CreateQuery(items[0], args)
 
 	p.logger.Debug(fmt.Sprintf("Parsed command '%s' into query structure '%v'", command, result))
 

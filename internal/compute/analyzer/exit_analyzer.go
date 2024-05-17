@@ -3,7 +3,7 @@ package analyzer
 import (
 	"fmt"
 
-	"github.com/alexver/golang_database/internal/compute/parser"
+	"github.com/alexver/golang_database/internal/query"
 )
 
 const COMMAND_EXIT_1 = "EXIT"
@@ -12,7 +12,7 @@ const COMMAND_EXIT_2 = "QUIT"
 type Exit struct {
 }
 
-func NewExit() AnalyzerInterface {
+func NewExit() *Exit {
 	return &Exit{}
 }
 
@@ -36,7 +36,7 @@ func (c *Exit) Supports(name string) bool {
 	return name == COMMAND_EXIT_1 || name == COMMAND_EXIT_2
 }
 
-func (c *Exit) Validate(query *parser.Query) error {
+func (c *Exit) Validate(query *query.Query) error {
 	if !c.Supports(query.GetCommand()) {
 		return fmt.Errorf("analyzer EXIT error: cannot process '%s' command", query.GetCommand())
 	}
@@ -48,7 +48,7 @@ func (c *Exit) Validate(query *parser.Query) error {
 	return nil
 }
 
-func (c *Exit) NormalizeQuery(query *parser.Query) *parser.Query {
+func (c *Exit) NormalizeQuery(query *query.Query) *query.Query {
 	query.SetCommand(COMMAND_EXIT_1)
 
 	return query

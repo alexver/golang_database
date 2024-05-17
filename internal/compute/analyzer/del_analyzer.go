@@ -3,8 +3,8 @@ package analyzer
 import (
 	"fmt"
 
-	"github.com/alexver/golang_database/internal/compute/parser"
 	"github.com/alexver/golang_database/internal/compute/tools"
+	"github.com/alexver/golang_database/internal/query"
 )
 
 const COMMAND_DEL = "DEL"
@@ -13,7 +13,7 @@ const COMMAND_DEL_ARG_COUNT = 1
 
 type Del struct{}
 
-func NewDel() AnalyzerInterface {
+func NewDel() *Del {
 	return &Del{}
 }
 
@@ -33,7 +33,7 @@ func (d *Del) Supports(name string) bool {
 	return name == COMMAND_DEL || name == COMMAND_DEL2
 }
 
-func (d *Del) Validate(query *parser.Query) error {
+func (d *Del) Validate(query *query.Query) error {
 	if !d.Supports(query.GetCommand()) {
 		return fmt.Errorf("analyzer DEL error: cannot process '%s' command", query.GetCommand())
 	}
@@ -49,7 +49,7 @@ func (d *Del) Validate(query *parser.Query) error {
 	return nil
 }
 
-func (d *Del) NormalizeQuery(query *parser.Query) *parser.Query {
+func (d *Del) NormalizeQuery(query *query.Query) *query.Query {
 
 	query.SetCommand(COMMAND_DEL)
 

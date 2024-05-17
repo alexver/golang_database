@@ -3,7 +3,7 @@ package analyzer
 import (
 	"testing"
 
-	"github.com/alexver/golang_database/internal/compute/parser"
+	"github.com/alexver/golang_database/internal/query"
 )
 
 func TestGet_Name(t *testing.T) {
@@ -98,7 +98,7 @@ func TestGet_Supports(t *testing.T) {
 
 func TestGet_Validate(t *testing.T) {
 	type args struct {
-		query *parser.Query
+		query *query.Query
 	}
 	tests := []struct {
 		name      string
@@ -108,25 +108,25 @@ func TestGet_Validate(t *testing.T) {
 	}{
 		{
 			name:      "fail because wrong command name",
-			args:      args{query: parser.CreateQuery("ANY", []string{"Test"})},
+			args:      args{query: query.CreateQuery("ANY", []string{"Test"})},
 			wantErr:   true,
 			errString: "analyzer GET error: cannot process 'ANY' command",
 		},
 		{
 			name:      "fail because wrong argument count",
-			args:      args{query: parser.CreateQuery("GET", []string{"Test", "Check"})},
+			args:      args{query: query.CreateQuery("GET", []string{"Test", "Check"})},
 			wantErr:   true,
 			errString: "analyzer GET error: invalid argument count 2",
 		},
 		{
 			name:      "fail because invalid argument",
-			args:      args{query: parser.CreateQuery("GET", []string{"Русский"})},
+			args:      args{query: query.CreateQuery("GET", []string{"Русский"})},
 			wantErr:   true,
 			errString: "analyzer GET error: invalid argument #1: Русский",
 		},
 		{
 			name:      "ok",
-			args:      args{query: parser.CreateQuery("GET", []string{"Test"})},
+			args:      args{query: query.CreateQuery("GET", []string{"Test"})},
 			wantErr:   false,
 			errString: "",
 		},
@@ -143,7 +143,7 @@ func TestGet_Validate(t *testing.T) {
 
 func TestGet_NormalizeQuery(t *testing.T) {
 	type args struct {
-		query *parser.Query
+		query *query.Query
 	}
 	tests := []struct {
 		name string
@@ -152,7 +152,7 @@ func TestGet_NormalizeQuery(t *testing.T) {
 	}{
 		{
 			name: "check normalization",
-			args: args{query: parser.CreateQuery("TEST", []string{})},
+			args: args{query: query.CreateQuery("TEST", []string{})},
 			want: "GET",
 		},
 	}

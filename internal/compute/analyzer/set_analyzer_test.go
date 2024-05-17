@@ -3,7 +3,7 @@ package analyzer
 import (
 	"testing"
 
-	"github.com/alexver/golang_database/internal/compute/parser"
+	"github.com/alexver/golang_database/internal/query"
 )
 
 func TestSet_Name(t *testing.T) {
@@ -101,7 +101,7 @@ func TestSet_Supports(t *testing.T) {
 
 func TestSet_Validate(t *testing.T) {
 	type args struct {
-		query *parser.Query
+		query *query.Query
 	}
 	tests := []struct {
 		name      string
@@ -111,31 +111,31 @@ func TestSet_Validate(t *testing.T) {
 	}{
 		{
 			name:      "fail because wrong command name",
-			args:      args{query: parser.CreateQuery("ANY", []string{"Test"})},
+			args:      args{query: query.CreateQuery("ANY", []string{"Test"})},
 			wantErr:   true,
 			errString: "analyzer SET error: cannot process 'ANY' command",
 		},
 		{
 			name:      "fail because wrong argument count",
-			args:      args{query: parser.CreateQuery("SET", []string{"Test"})},
+			args:      args{query: query.CreateQuery("SET", []string{"Test"})},
 			wantErr:   true,
 			errString: "analyzer SET error: invalid argument count 2",
 		},
 		{
 			name:      "fail because invalid argument #1",
-			args:      args{query: parser.CreateQuery("SET", []string{"==="})},
+			args:      args{query: query.CreateQuery("SET", []string{"==="})},
 			wantErr:   true,
 			errString: "analyzer SET error: invalid argument #1: ===",
 		},
 		{
 			name:      "fail because invalid argument #2",
-			args:      args{query: parser.CreateQuery("SET", []string{"test", "wrong!value"})},
+			args:      args{query: query.CreateQuery("SET", []string{"test", "wrong!value"})},
 			wantErr:   true,
 			errString: "analyzer SET error: invalid argument #2: wrong!value",
 		},
 		{
 			name:      "ok",
-			args:      args{query: parser.CreateQuery("SET", []string{"test", "check_value"})},
+			args:      args{query: query.CreateQuery("SET", []string{"test", "check_value"})},
 			wantErr:   false,
 			errString: "",
 		},
@@ -152,7 +152,7 @@ func TestSet_Validate(t *testing.T) {
 
 func TestSet_NormalizeQuery(t *testing.T) {
 	type args struct {
-		query *parser.Query
+		query *query.Query
 	}
 	tests := []struct {
 		name string
@@ -161,7 +161,7 @@ func TestSet_NormalizeQuery(t *testing.T) {
 	}{
 		{
 			name: "check normalization",
-			args: args{query: parser.CreateQuery("TEST", []string{})},
+			args: args{query: query.CreateQuery("TEST", []string{})},
 			want: "SET",
 		},
 	}
