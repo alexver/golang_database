@@ -1,4 +1,6 @@
-package engine
+package storage
+
+const ENGINE_IN_MEMORY = "in-memory"
 
 type EngineInterface interface {
 	Set(string, string) error

@@ -6,67 +6,67 @@ import (
 	"github.com/alexver/golang_database/internal/query"
 )
 
-func TestGet_Name(t *testing.T) {
+func TestPing_Name(t *testing.T) {
 	tests := []struct {
 		name string
 		want string
 	}{
 		{
 			name: "check name",
-			want: "GET",
+			want: "PING",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			g := NewGet()
-			if got := g.Name(); got != tt.want {
-				t.Errorf("Get.Name() = %v, want %v", got, tt.want)
+			c := NewPing()
+			if got := c.Name(); got != tt.want {
+				t.Errorf("Ping.Name() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestGet_Description(t *testing.T) {
+func TestPing_Description(t *testing.T) {
 	tests := []struct {
 		name string
 		want string
 	}{
 		{
 			name: "check description",
-			want: "Get saved value by key. Usage: GET key.",
+			want: "Command to ping test database. Standard answer of the server is PONG.",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			g := NewGet()
-			if got := g.Description(); got != tt.want {
-				t.Errorf("Get.Description() = %v, want %v", got, tt.want)
+			c := NewPing()
+			if got := c.Description(); got != tt.want {
+				t.Errorf("Ping.Description() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestGet_Usage(t *testing.T) {
+func TestPing_Usage(t *testing.T) {
 	tests := []struct {
 		name string
 		want string
 	}{
 		{
 			name: "check usage",
-			want: "GET key",
+			want: "PING",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			g := NewGet()
-			if got := g.Usage(); got != tt.want {
-				t.Errorf("Get.Usage() = %v, want %v", got, tt.want)
+			c := NewPing()
+			if got := c.Usage(); got != tt.want {
+				t.Errorf("Ping.Usage() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestGet_Supports(t *testing.T) {
+func TestPing_Supports(t *testing.T) {
 	type args struct {
 		name string
 	}
@@ -81,22 +81,22 @@ func TestGet_Supports(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "check GET",
-			args: args{name: "GET"},
+			name: "check PING",
+			args: args{name: "PING"},
 			want: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			g := NewGet()
-			if got := g.Supports(tt.args.name); got != tt.want {
-				t.Errorf("Get.Supports() = %v, want %v", got, tt.want)
+			c := NewPing()
+			if got := c.Supports(tt.args.name); got != tt.want {
+				t.Errorf("Ping.Supports() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestGet_Validate(t *testing.T) {
+func TestPing_Validate(t *testing.T) {
 	type args struct {
 		query *query.Query
 	}
@@ -110,39 +110,33 @@ func TestGet_Validate(t *testing.T) {
 			name:      "fail because wrong command name",
 			args:      args{query: query.CreateQuery("ANY", []string{"Test"})},
 			wantErr:   true,
-			errString: "analyzer GET error: cannot process 'ANY' command",
+			errString: "analyzer PING error: cannot process 'ANY' command",
 		},
 		{
 			name:      "fail because wrong argument count",
-			args:      args{query: query.CreateQuery("GET", []string{"Test", "Check"})},
+			args:      args{query: query.CreateQuery("PING", []string{"Test"})},
 			wantErr:   true,
-			errString: "analyzer GET error: invalid argument count 2",
-		},
-		{
-			name:      "fail because invalid argument",
-			args:      args{query: query.CreateQuery("GET", []string{"Русский"})},
-			wantErr:   true,
-			errString: "analyzer GET error: invalid argument #1: Русский",
+			errString: "analyzer PING error: invalid argument count 1",
 		},
 		{
 			name:      "ok",
-			args:      args{query: query.CreateQuery("GET", []string{"Test"})},
+			args:      args{query: query.CreateQuery("PING", []string{})},
 			wantErr:   false,
 			errString: "",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			g := NewGet()
-			err := g.Validate(tt.args.query)
+			c := NewPing()
+			err := c.Validate(tt.args.query)
 			if (err != nil) != tt.wantErr || (err != nil && err.Error() != tt.errString) {
-				t.Errorf("Get.Validate() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Ping.Validate() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
 }
 
-func TestGet_NormalizeQuery(t *testing.T) {
+func TestPing_NormalizeQuery(t *testing.T) {
 	type args struct {
 		query *query.Query
 	}
@@ -154,15 +148,15 @@ func TestGet_NormalizeQuery(t *testing.T) {
 		{
 			name: "check normalization",
 			args: args{query: query.CreateQuery("TEST", []string{})},
-			want: "GET",
+			want: "PING",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			g := NewGet()
-			got := g.NormalizeQuery(tt.args.query)
+			c := NewPing()
+			got := c.NormalizeQuery(tt.args.query)
 			if got.GetCommand() != tt.want {
-				t.Errorf("Get.NormalizeQuery() = %v, want %v", got, tt.want)
+				t.Errorf("Ping.NormalizeQuery() = %v, want %v", got, tt.want)
 			}
 		})
 	}
