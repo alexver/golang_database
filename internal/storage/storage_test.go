@@ -5,7 +5,6 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/alexver/golang_database/internal/storage/engine"
 	"github.com/stretchr/testify/mock"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -44,7 +43,7 @@ func (m *InMemoryMock) Keys() *[]string {
 
 func TestCreateStorage(t *testing.T) {
 	type args struct {
-		engine engine.EngineInterface
+		engine EngineInterface
 		logger *zap.Logger
 	}
 
@@ -92,7 +91,7 @@ func TestCreateStorage(t *testing.T) {
 
 func TestStorage_Set(t *testing.T) {
 	type fields struct {
-		engine engine.EngineInterface
+		engine EngineInterface
 		logger *zap.Logger
 	}
 	type args struct {
@@ -156,7 +155,7 @@ func TestStorage_Set(t *testing.T) {
 
 func TestStorage_Get(t *testing.T) {
 	type fields struct {
-		engine engine.EngineInterface
+		engine EngineInterface
 		logger *zap.Logger
 	}
 	type args struct {
@@ -230,7 +229,7 @@ func TestStorage_Get(t *testing.T) {
 
 func TestStorage_Del(t *testing.T) {
 	type fields struct {
-		engine engine.EngineInterface
+		engine EngineInterface
 		logger *zap.Logger
 	}
 	type args struct {
