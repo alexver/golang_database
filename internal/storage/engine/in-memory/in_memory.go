@@ -4,9 +4,10 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"sync"
 )
 
-const COLLISION_MAX = 5
+const COLLISION_MAX = 3
 
 type dataRecord struct {
 	key   string
@@ -14,14 +15,21 @@ type dataRecord struct {
 }
 
 type dataTable struct {
-	data map[string]dataRecord
+	data  map[string]dataRecord
+	mutex sync.RWMutex
 }
 
 func CreateEngine() *dataTable {
-	return &dataTable{data: make(map[string]dataRecord)}
+	return &dataTable{
+		data:  make(map[string]dataRecord),
+		mutex: sync.RWMutex{},
+	}
 }
 
 func (t *dataTable) Set(key string, value string) error {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+
 	hash, _, _, err := t.getHashAndValue(key)
 	if err != nil {
 		return err
@@ -33,16 +41,23 @@ func (t *dataTable) Set(key string, value string) error {
 }
 
 func (t *dataTable) Get(key string) (string, bool, error) {
+	t.mutex.RLock()
+	defer t.mutex.RUnlock()
+
 	_, value, ok, err := t.getHashAndValue(key)
 
 	return value, ok, err
 }
 
 func (t *dataTable) Delete(key string) error {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+
 	hash, _, ok, err := t.getHashAndValue(key)
 	if err != nil {
 		return err
 	}
+
 	if ok {
 		delete(t.data, hash)
 
@@ -53,6 +68,9 @@ func (t *dataTable) Delete(key string) error {
 }
 
 func (t *dataTable) IsSet(key string) (bool, error) {
+	t.mutex.RLock()
+	defer t.mutex.RUnlock()
+
 	_, _, ok, err := t.getHashAndValue(key)
 	if err != nil {
 		return false, err
@@ -62,6 +80,9 @@ func (t *dataTable) IsSet(key string) (bool, error) {
 }
 
 func (t *dataTable) Keys() *[]string {
+	t.mutex.RLock()
+	defer t.mutex.RUnlock()
+
 	var keys = make([]string, len(t.data))
 
 	idx := 0

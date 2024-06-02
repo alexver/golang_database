@@ -1,9 +1,6 @@
 logger:
-  level: "info"
   output: "/tmp/db_server.log"
 network_server:
-  network: "tcp"
-  host: "127.0.0.1"
-  port: 8080
+  max_connections: 5
 db_engine:
   type: "in-memory"

@@ -13,9 +13,10 @@ type LoggerConfig struct {
 }
 
 type NetworkServerConfig struct {
-	Network string `mapstructure:"network" default:"tcp"`
-	Host    string `mapstructure:"host" default:"127.0.0.1"`
-	Port    int    `mapstructure:"port" default:"8080"`
+	Network        string `mapstructure:"network" default:"tcp"`
+	Host           string `mapstructure:"host" default:"127.0.0.1"`
+	Port           int    `mapstructure:"port" default:"8080"`
+	MaxConnections int    `mapstructure:"max_connections" default:"10"`
 }
 
 type DbEngineConfig struct {

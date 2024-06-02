@@ -23,6 +23,9 @@ func main() {
 		logger.Error(fmt.Sprintf("Database initialization error: %s", err))
 	}
 
-	server := network.CreateServer(dbConfig.GetNetworkServerConfig(), db, logger)
+	server, err := network.CreateServer(dbConfig.GetNetworkServerConfig(), db, logger)
+	if err != nil {
+		logger.Error(fmt.Sprintf("Database server run error: %s", err))
+	}
 	server.StartServer()
 }

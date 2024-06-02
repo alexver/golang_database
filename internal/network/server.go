@@ -3,37 +3,43 @@ package network
 import (
 	"fmt"
 	"io"
-	"log"
 	"net"
 
 	database "github.com/alexver/golang_database/internal"
+	"github.com/alexver/golang_database/internal/common"
 	"github.com/alexver/golang_database/internal/config"
 	"go.uber.org/zap"
 )
 
 type Server struct {
-	logger *zap.Logger
-	db     *database.Database
+	logger            *zap.Logger
+	db                *database.Database
+	connectionLimiter *common.Semaphore
 
 	network string
 	address string
 }
 
-func CreateServer(config *config.NetworkServerConfig, db *database.Database, logger *zap.Logger) *Server {
+func CreateServer(config *config.NetworkServerConfig, db *database.Database, logger *zap.Logger) (*Server, error) {
 	if logger == nil {
-		log.Fatal("Logger is not valid")
+		return nil, fmt.Errorf("logger is not valid")
 	}
 
 	if db == nil {
-		log.Fatal("Database is not valid")
+		return nil, fmt.Errorf("database is not valid")
+	}
+
+	if config.MaxConnections <= 0 {
+		return nil, fmt.Errorf("invalid Max Connections value: %d", config.MaxConnections)
 	}
 
 	return &Server{
-		network: config.Network,
-		address: fmt.Sprintf("%s:%d", config.Host, config.Port),
-		db:      db,
-		logger:  logger,
-	}
+		network:           config.Network,
+		address:           fmt.Sprintf("%s:%d", config.Host, config.Port),
+		db:                db,
+		logger:            logger,
+		connectionLimiter: common.NewSemaphore(config.MaxConnections),
+	}, nil
 }
 
 func (s *Server) StartServer() {
@@ -54,7 +60,12 @@ func (s *Server) StartServer() {
 			continue
 		}
 
-		go s.handleClient(connection)
+		go func(connection net.Conn) {
+			s.connectionLimiter.Acquire()
+			defer s.connectionLimiter.Release()
+
+			s.handleClient(connection)
+		}(connection)
 	}
 }
 
