@@ -3,7 +3,6 @@ package storage
 import (
 	"fmt"
 
-	"github.com/alexver/golang_database/internal/storage/engine"
 	"go.uber.org/zap"
 )
 
@@ -14,11 +13,11 @@ type StorageInterface interface {
 }
 
 type Storage struct {
-	engine engine.EngineInterface
+	engine EngineInterface
 	logger *zap.Logger
 }
 
-func CreateStorage(engine engine.EngineInterface, logger *zap.Logger) (StorageInterface, error) {
+func CreateStorage(engine EngineInterface, logger *zap.Logger) (StorageInterface, error) {
 	if engine == nil {
 		return nil, fmt.Errorf("engine is required")
 	}

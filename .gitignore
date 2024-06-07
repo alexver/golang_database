@@ -21,3 +21,6 @@ main
 
 # Go workspace file
 go.work
+cli
+db_client
+db_server

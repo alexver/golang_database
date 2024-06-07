@@ -1,0 +1,6 @@
+logger:
+  output: "/tmp/db_server.log"
+network_server:
+  max_connections: 5
+db_engine:
+  type: "in-memory"

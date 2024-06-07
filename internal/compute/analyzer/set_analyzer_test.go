@@ -27,12 +27,9 @@ func TestSet_Name(t *testing.T) {
 }
 
 func TestSet_Description(t *testing.T) {
-	type fields struct {
-	}
 	tests := []struct {
-		name   string
-		fields fields
-		want   string
+		name string
+		want string
 	}{
 		{
 			name: "check description",
@@ -119,11 +116,11 @@ func TestSet_Validate(t *testing.T) {
 			name:      "fail because wrong argument count",
 			args:      args{query: query.CreateQuery("SET", []string{"Test"})},
 			wantErr:   true,
-			errString: "analyzer SET error: invalid argument count 2",
+			errString: "analyzer SET error: invalid argument count 1",
 		},
 		{
 			name:      "fail because invalid argument #1",
-			args:      args{query: query.CreateQuery("SET", []string{"==="})},
+			args:      args{query: query.CreateQuery("SET", []string{"===", "value"})},
 			wantErr:   true,
 			errString: "analyzer SET error: invalid argument #1: ===",
 		},
@@ -143,7 +140,8 @@ func TestSet_Validate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := NewSet()
-			if err := s.Validate(tt.args.query); (err != nil) != tt.wantErr {
+			err := s.Validate(tt.args.query)
+			if (err != nil) != tt.wantErr || (err != nil && err.Error() != tt.errString) {
 				t.Errorf("Set.Validate() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
