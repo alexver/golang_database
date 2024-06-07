@@ -46,7 +46,7 @@ func main() {
 			break
 		}
 
-		result := client.CallClient(command)
+		result := client.Call(command)
 
 		fmt.Println(result)
 	}

@@ -18,7 +18,7 @@ func CreateClient(network string, host string, port int) *Client {
 	}
 }
 
-func (c *Client) CallClient(message string) string {
+func (c *Client) Call(message string) string {
 	connection, err := net.Dial(c.network, c.address)
 	if err != nil {
 		log.Fatalf("Cannot connect to server '%s'", c.address)
